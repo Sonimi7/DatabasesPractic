@@ -35,17 +35,15 @@ public abstract class AbsTable {
 
     public void writeAll() {
         db = new MySQLConnector();
-        final String sqlRequest = String.format("SELECT * FROM %s", tableName);
+        final String sqlRequest = String.format("SELECT COUNT(*) FROM student", tableName);
         ResultSet rs = db.executeRequestWithAnswer(sqlRequest);
-        // Количество колонок в результирующем запросе
         try {
             int columns = rs.getMetaData().getColumnCount();
-            // Перебор строк с данными
             while (rs.next()) {
                 for (int i = 1; i <= columns; i++) {
                     System.out.print(rs.getString(i) + "\t");
                 }
-                System.out.println();
+                System.out.println("Количество студентов");
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

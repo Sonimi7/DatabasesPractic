@@ -46,11 +46,66 @@ public class StudentTable extends AbsTable{
         return students;
     }
 
-    public void createTableStudent() {
-        String sqlQuery = String.format("CREATE TABLE student " +
-                "(id int primary key, fio varchar(300), sex varchar(3), id_group int)");
-        db.executeRequest(sqlQuery);
+    public void informationAllStudentsGroupCurator() throws SQLException {
+        String sqlQuery = String.format("SELECT * FROM student JOIN `group` ON student.id_group=`group`.id " +
+                "JOIN curator ON `group`.id=curator.id");
+        ResultSet rs = db.executeRequestWithAnswer(sqlQuery);
+        while (rs.next()) {
+            System.out.println("Все студенты, группы, кураторы: |" +
+                    rs.getString(1) + "|" +
+                    rs.getString(2) + "|" +
+                    rs.getString(3) + "|" +
+                    rs.getString(4) + "|" +
+                    rs.getString(5) + "|" +
+                    rs.getString(6));
+        }
     }
+
+    public void selectCountStudent() throws SQLException {
+        String sqlQuery = String.format("SELECT COUNT(*) FROM student");
+        ResultSet rs = db.executeRequestWithAnswer(sqlQuery);
+        while (rs.next()) {
+            System.out.println("Количество студентов " + rs.getString(1));
+        }
+    }
+
+    public void selectAllWomen() throws SQLException {
+        String sqlQuery = String.format("SELECT * FROM student WHERE sex = 'жен'");
+        ResultSet rs = db.executeRequestWithAnswer(sqlQuery);
+        while (rs.next()) {
+            System.out.println("Студентки: " +
+                    rs.getString(1) + "|" +
+                    rs.getString(2) + "|" +
+                    rs.getString(3) + "|" +
+                    rs.getString(4));
+        }
+    }
+
+    public void selectGroupAndCurator() throws SQLException{
+        String sqlQuery = String.format("SELECT * FROM curator JOIN `group` on curator.id=`group`.id_curator");
+        ResultSet rs = db.executeRequestWithAnswer(sqlQuery);
+        while (rs.next()) {
+            System.out.println("Список групп и кураторов: " +
+                    rs.getString(1) + "|" +
+                    rs.getString(2) + "|" +
+                    rs.getString(3) + "|" +
+                    rs.getString(4));
+        }
+    }
+
+    public void selectStudentCondition() throws SQLException{
+        String sqlQuery = String.format("SELECT * FROM student JOIN `group` " +
+                "ON student.id_group=`group`.id WHERE name='тестировщики'");
+        ResultSet rs = db.executeRequestWithAnswer(sqlQuery);
+        while (rs.next()) {
+            System.out.println("Студенты из группы тестировщики: " +
+                    rs.getString(1) + "|" +
+                    rs.getString(2) + "|" +
+                    rs.getString(3) + "|" +
+                    rs.getString(4));
+        }
+    }
+
     public void insert(Student student){
         db = new MySQLConnector();
         String sqlQuery = String.format("INSERT INTO %s (fio, sex, id_group) " +
@@ -59,23 +114,4 @@ public class StudentTable extends AbsTable{
         db.executeRequest(sqlQuery);
     }
 
-    public void select(String[] columns, String[] where) {
-        String columnStr = "*";
-        if(columns.length > 0 ) {
-            columnStr = String.join(",", columns);
-        }
-
-        String sqlQuery = String.format("SELECT %s FROM student ", columnStr);
-        db.executeRequest(sqlQuery);
-    }
-
-    public void update(int id_curator) {
-        String sqlQuery = String.format("UPDATE %s SET curator=%s", tableName, id_curator);
-        db.executeRequest(sqlQuery);
-    }
-
-    public void delete() {
-        String sqlQuery = String.format("TRUNCATE TABLE student", tableName);
-        db.executeRequest(sqlQuery);
-    }
 }

@@ -6,6 +6,7 @@ import tables.CuratorTable;
 import tables.GroupTable;
 import tables.StudentTable;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Main {
@@ -14,9 +15,8 @@ public class Main {
 
         try {
             StudentTable studentTable = new StudentTable();
-            studentTable.createTableStudent();
             ArrayList<Student> students = studentTable.selectAll();
-            if (students.size() <= 15) {
+            if (students.isEmpty()) {
                 studentTable.insert(new Student("Иванов Иван Иванович", "муж", 1));
                 studentTable.insert(new Student("Петрова Валентина Петровна", "жен", 2));
                 studentTable.insert(new Student("Кречетов Геннадий Иванович", "муж", 3));
@@ -35,19 +35,34 @@ public class Main {
                 students = studentTable.selectAll();
             }
 
-            for (Student tmp : students) {
-                System.out.println(tmp.toString());
+            CuratorTable curatorTable = new CuratorTable();
+            ArrayList<Curator> curators = curatorTable.selectAll();
+            if (curators.isEmpty()) {
+                curatorTable.insertCurator(new Curator("Дягилев Иван Иванович"));
+                curatorTable.insertCurator(new Curator("Меньшиков Валентина Петровна"));
+                curatorTable.insertCurator(new Curator("Островский Геннадий Иванович"));
+                curatorTable.insertCurator(new Curator("Петровский Геннадий Иванович"));
+                curators = curatorTable.selectAll();
             }
 
-            System.out.println();
-            students = studentTable.selectAll();
-            for (Student tmp : students) {
-                System.out.println(tmp.toString());
+            GroupTable groupTable = new GroupTable();
+            ArrayList<Group> groups = groupTable.selectAll();
+            if(groups.isEmpty()) {
+                groupTable.insertGroup(new Group("разработчики", 1));
+                groupTable.insertGroup(new Group("тестировщики", 2));
+                groupTable.insertGroup(new Group("аналитики", 3));
+                groups = groupTable.selectAll();
             }
 
-            //studentTable.select(new String[]{"fio"}, new String[]{});
-            //studentTable.delete();
+            studentTable.informationAllStudentsGroupCurator();
+            studentTable.selectCountStudent();
+            studentTable.selectAllWomen();
+            studentTable.selectGroupAndCurator();
+            studentTable.selectStudentCondition();
+            groupTable.updateGroup(50);
 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             MySQLConnector.close();
         }
